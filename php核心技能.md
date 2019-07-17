@@ -117,3 +117,79 @@
 
 ### 核心知识
 
+### 调试工具
+
+####		xdebug的安装与使用
+
+很多PHP程序员调试使用echo、print_r()、var_dump()、printf()，通过分段输出，来定位程序问题，这样调试，效率比较低下，想要实时了解程序的输出且连续的分步调试，这时候我们就需要用到xdebug。Xdebug是一个开放源代码的PHP程序调试器(即一个Debug工具)，可以用来跟踪，调试和分析PHP程序的运行状况。
+
+##### 安装步骤
+
+~~~
+1.下载：官网：https://xdebug.org/download.php  
+  注：linux下载source文件
+  	  windows下载.dll文件
+  	  需要和相关的php版本匹配
+2. 安装：
+   wget https://xdebug.org/files/php_xdebug-2.8.0alpha1-7.1-vc14-nts-x86_64.dll
+   tar -xvzf xdebug-2.8.0alpha1.tgz
+   cd xdebug-2.8.0alpha1
+   phpize
+   ./configure --with-php-config=/usr/local/php71/bin/php-config (where is php-config可查找到相关路径)
+   make && make install
+~~~
+
+安装成功，则会出现如下信息，进出xdebug.so的目录位置
+
+![](G:\study\技能考核\php-\images\174510_nRXs_1761919.jpg)
+
+##### 配置
+
+~~~
+修改php.ini，加入如下信息
+[xdebug]
+zend_extension="/usr/local/php71/lib/php/extensions/no-debug-non-zts-20160303/xdebug.so"
+xdebug.remote_enable = 1
+xdebug.remote_handler = "dbgp"
+xdebug.remote_host = "192.168.29.168"
+xdebug.remote_port = 9009
+xdebug.idekey = "PHPSTORM"
+xdebug.trace_output_dir = "/tmp/phptrace"
+xdebug.collect_vars = 1
+xdebug.collect_return = 1
+xdebug.collect_params = 1
+xdebug.remote_autostart = 1
+xdebug.show_exception_trace = 1
+~~~
+
+配置完成后，重启php-fpm，开启9009端口，此时虚拟机配置完成，查看phpinfo，显示如下，代表安装成功
+
+![](G:\study\技能考核\php-\images\1563352213(1).png)
+
+##### phpstorm配置
+
+对phpstorm分别做如下配置
+
+![](G:\study\技能考核\php-\images\debug_set.jpg)
+
+![](G:\study\技能考核\php-\images\server_set.jpg)
+
+
+
+##### chrome浏览器
+
+对chrome浏览器安装Xdebug helper，并做如下设置
+
+![](G:\study\技能考核\php-\images\xdebug_helper.jpg)
+
+此时用chrome请求服务时，点击phpstorm监听
+
+![](G:\study\技能考核\php-\images\lisen_set.jpg)
+
+
+
+##### postman配置
+
+在请求头
+
+headers加上key值为Cookie，value为XDEBUG_SESSION=PHPSTORM，phpstorm同样打开监听即可。
