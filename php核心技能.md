@@ -113,7 +113,173 @@
 
    #### traits代码复用
    
+   php一直都是单继承的，无法同时从两个基类中继承属性和方法，为了解决这个问题，php从5.4开始，实现了一种代码复用的方法，即trait。
    
+   trait和class类似，但是trait仅仅是用细粒度和一致的方式来组合功能。无法通过trait来实现实例化。trait为传统的继承之外增加了水平特性的组合。
+   
+   eg：
+   
+   ~~~
+   <?php
+   trait ezcReflectionReturnInfo {
+       function getReturnType() { /*1*/ }
+       function getReturnDescription() { /*2*/ }
+   }
+   
+   class ezcReflectionMethod extends ReflectionMethod {
+       use ezcReflectionReturnInfo;
+       /* ... */
+   }
+   
+   class ezcReflectionFunction extends ReflectionFunction {
+       use ezcReflectionReturnInfo;
+       /* ... */
+   }
+   ~~~
+   
+   ###### 优先级
+   
+   如果当前类B继承了父类A的method方法，同时引用了 trait C(包含method方法)，B又定义了method方法，当  b = new B()时，优先级顺序
+   
+    ~~~
+   B.method > C.method > A.method
+    ~~~
+   
+   即 <u>从基类继承的成员会被 trait 插入的成员所覆盖。优先顺序是来自当前类的成员覆盖了 trait 的方法，而 trait 则覆盖了被继承的方法</u>。
+   
+   ###### 多个trait
+   
+   一个类中要引用多个trait A、trait B，在use声明中用逗号隔开，即
+   
+   ~~~
+   use A,B;
+   ~~~
+   
+   思考：以下程序会输出什么结构
+   
+   ~~~
+   <?php
+   	trait A 
+   	{
+   		public function method() 
+   		{
+   			echo 'A';
+   		}
+   	}
+   	trait B
+   	{
+   		public function method()
+   		{
+   			echo 'B';
+   		}
+   	}
+   	class Mytest
+   	{
+   		use A,B;
+   	}
+   	$obj = new Mytest();
+   	$obj->method();
+   ~~~
+   
+   最后输出结果
+   
+   ![](.\images\trait_1.png)
+   
+   即引用的两个trait下如果有同名方法，则会产生以上致命错误，如果没有引用到一个类中，则不会产生以上冲突和错误
+   
+   ###### 解决以上冲突的方法
+   
+   为了解决多个 trait 在同一个类中的命名冲突，需要使用 *insteadof* 操作符来明确指定使用冲突方法中的哪一个。以上方式仅允许排除掉其它方法，*as*操作符则可以 为某个方法引入别名。 注意，*as* 操作符不会对方法进行重命名，也不会影响其方法。
+   
+   ~~~
+   <?php
+   trait A {
+       public function smallTalk() {
+           echo 'a';
+       }
+       public function bigTalk() {
+           echo 'A';
+       }
+   }
+   
+   trait B {
+       public function smallTalk() {
+           echo 'b';
+       }
+       public function bigTalk() {
+           echo 'B';
+       }
+   }
+   
+   class Talker {
+       use A, B {
+           B::smallTalk insteadof A;
+           A::bigTalk insteadof B;
+       }
+   }
+   
+   class Aliased_Talker {
+       use A, B {
+           B::smallTalk insteadof A;
+           A::bigTalk insteadof B;
+           B::bigTalk as talk;
+       }
+   }
+   
+   $talker = new Talker();
+   $talker->smallTalk();
+   $talker->bigTalk();
+   $as_talker = new Aliased_Talker();
+   $as_talk->bigTalk();
+   $as_talk->smallTalk();
+   $as_talk->talk();
+   ~~~
+   
+   以上结果输出：
+   
+   ![](.\images\trait_2.png)
+
+###### 在引用类中修改引用trait中方法的控制
+
+可在引用类中，对引用的trait方法，修改方法的访问控制，如下：
+
+~~~
+<?php
+trait A {
+    public function methodA() {
+        echo 'a';
+    }
+	
+	 public function methodB() {
+        echo 'B';
+    }
+}
+
+class MyTestA
+{
+	use A{methodA as public;}
+}
+
+class MyTestB
+{
+	use A{methodA as private myPrivateMethodA;}
+}
+
+class MytestC extends MyTestA
+{
+}
+
+class MytestD extends MyTestB
+{
+}
+
+$objA = new MytestA();
+$objA->methodA();								//输出 a
+~~~
+
+###### 从 trait 来组成 trait
+
+
 
 ### 核心知识
 
