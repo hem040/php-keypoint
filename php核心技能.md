@@ -117,13 +117,13 @@
 
 ### 核心知识
 
-### 调试工具
+#### 调试工具
 
-####		xdebug的安装与使用
+##### xdebug的安装与使用
 
 很多PHP程序员调试使用echo、print_r()、var_dump()、printf()，通过分段输出，来定位程序问题，这样调试，效率比较低下，想要实时了解程序的输出且连续的分步调试，这时候我们就需要用到xdebug。Xdebug是一个开放源代码的PHP程序调试器(即一个Debug工具)，可以用来跟踪，调试和分析PHP程序的运行状况。
 
-##### 安装步骤
+###### 安装步骤
 
 ~~~
 1.下载：官网：https://xdebug.org/download.php  
@@ -143,7 +143,7 @@
 
 ![](G:\study\技能考核\php-\images\174510_nRXs_1761919.jpg)
 
-##### 配置
+###### 配置
 
 ~~~
 修改php.ini，加入如下信息
@@ -166,7 +166,7 @@ xdebug.show_exception_trace = 1
 
 ![](G:\study\技能考核\php-\images\1563352213(1).png)
 
-##### phpstorm配置
+###### phpstorm配置
 
 对phpstorm分别做如下配置
 
@@ -174,9 +174,7 @@ xdebug.show_exception_trace = 1
 
 ![](G:\study\技能考核\php-\images\server_set.jpg)
 
-
-
-##### chrome浏览器
+###### chrome浏览器
 
 对chrome浏览器安装Xdebug helper，并做如下设置
 
@@ -186,9 +184,7 @@ xdebug.show_exception_trace = 1
 
 ![](G:\study\技能考核\php-\images\lisen_set.jpg)
 
-
-
-##### postman配置
+###### postman配置
 
 在请求头
 
