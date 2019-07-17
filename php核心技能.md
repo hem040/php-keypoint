@@ -164,25 +164,25 @@ xdebug.show_exception_trace = 1
 
 配置完成后，重启php-fpm，开启9009端口，此时虚拟机配置完成，查看phpinfo，显示如下，代表安装成功
 
-![](G:\study\技能考核\php-\images\1563352213(1).png)
+![](.\images\1563352213(1).png)
 
 ###### phpstorm配置
 
 对phpstorm分别做如下配置
 
-![](G:\study\技能考核\php-\images\debug_set.jpg)
+![](.\images\debug_set.jpg)
 
-![](G:\study\技能考核\php-\images\server_set.jpg)
+![](.\images\server_set.jpg)
 
 ###### chrome浏览器
 
 对chrome浏览器安装Xdebug helper，并做如下设置
 
-![](G:\study\技能考核\php-\images\xdebug_helper.jpg)
+![](.\images\xdebug_helper.jpg)
 
 此时用chrome请求服务时，点击phpstorm监听
 
-![](G:\study\技能考核\php-\images\lisen_set.jpg)
+![](.\images\lisen_set.jpg)
 
 ###### postman配置
 
