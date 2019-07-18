@@ -307,7 +307,7 @@ $objA->methodA();								//输出 a
 
 安装成功，则会出现如下信息，进出xdebug.so的目录位置
 
-![](G:\study\技能考核\php-\images\174510_nRXs_1761919.jpg)
+![](.\images\174510_nRXs_1761919.jpg)
 
 ###### 配置
 
