@@ -46,7 +46,95 @@ echo $foo->{$arr}[1] . "\n"; \\ I am B  先读取 $foo->arr,再读取属性数�
  	2. 类的属性也可以通过可变属性名来访问。可变属性名将在该调用所处的范围内被解析。例如，对于 $foo->$bar 表达式，则会在本地范围来解析 $bar 并且其值将被用于 $foo 的属性名。对于 $bar 是数组单元时也是一样。
  	3. 在 PHP 的函数和类的方法中，[超全局变量](https://www.php.net/manual/zh/language.variables.superglobals.php)不能用作可变变量。*$this* 变量也是一个特殊变量，不能被动态引用。
 
-#### 2. 匿名函数
+#### 2. 函数传值
+
+1. 一般情况下，值传递不改变函数外部变量值
+
+2. 如果是引用传值，则会改变函数外部的变量值
+
+3. 函数传值严格类型：默认情况下，如果能做到的话，PHP将会强迫错误类型的值转为函数期望的标量类型。 例如，一个函数的一个参数期望是[string](https://www.php.net/manual/zh/language.types.string.php)，但传入的是[integer](https://www.php.net/manual/zh/language.types.integer.php)，最终函数得到的将会是一个[string](https://www.php.net/manual/zh/language.types.string.php)类型的值。可以基于每一个文件开启严格模式。在严格模式中，只有一个与类型声明完全相符的变量才会被接受，否则将会抛出一个**TypeError**。 唯一的一个例外是可以将[integer](https://www.php.net/manual/zh/language.types.integer.php)传给一个期望[float](https://www.php.net/manual/zh/language.types.float.php)的函数。
+
+   ~~~
+   <?php
+   declare(strict_types=1);			//声明为开启严格模式
+   
+   function sum(int $a, int $b) {
+       return $a + $b;
+   }
+   
+   var_dump(sum(1, 2));            //int(3)
+   var_dump(sum(1.5, 2.5));        //typeerror
+   ~~~
+
+   ~~~
+   <?php
+   function sum(int $a, int $b) {
+       return $a + $b;
+   }
+   
+   var_dump(sum(1, 2));			//int(3)
+   
+   // These will be coerced to integers: note the output below!
+   var_dump(sum(1.5, 2.5));        int(3)
+   ~~~
+
+   4. 可变数量的参数列表
+
+      php支持用户在自定义函数的参数中，参数列表是可变的。在php5.6+由***...***实现，在php5.5-版本中，使用函数***func_num_args()***,***[func_get_arg()***,***func_get_args()***
+
+   ~~~
+   <?php
+   function sum(...$numbers) {
+       $acc = 0;
+       foreach ($numbers as $n) {
+           $acc += $n;
+       }
+       return $acc;
+   }
+   
+   echo sum(1, 2, 3, 4);    //10
+   ~~~
+
+   ~~~
+   <?php
+   function add($a, $b) {
+       return $a + $b;
+   }
+   
+   echo add(...[1, 2])."\n";    \\ 10
+   
+   $a = [1, 2];
+   echo add(...$a);              \\ 10
+   //可变长传参给定长，取相应个数的参数
+   ~~~
+
+   ~~~
+   <?php
+   function foo() 
+   {
+   	echo 'variable number is ' . func_num_args() . "\n";
+   	echo func_get_arg(1) . "\n";
+   	var_dump(func_get_args());
+   }
+   
+   foo(1,2,3);
+   
+   输出：
+   variable number is 3
+   2
+   array(3) {
+    [0]=>
+    int(1)
+    [1]=>
+    int(2)
+    [2]=>
+    int(3)
+   }
+   ~~~
+
+   
+
+#### 3. 匿名函数
 
 匿名函数（闭包），允许临时创建一个没有指定名称的函数。经常用于回调函数的参数值。
 
@@ -104,7 +192,7 @@ $message = 'hello';
 echo $example();	   //hello    想想为什么
 ~~~
 
-#### 3. 匿名类
+#### 4. 匿名类
 
 匿名类可以创建一次性的简单对象
 
