@@ -132,6 +132,38 @@ echo $foo->{$arr}[1] . "\n"; \\ I am B  先读取 $foo->arr,再读取属性数�
    }
    ~~~
 
+   5. trigger_error函数
+   
+   trigger_error() 函数创建用户级别的错误消息。
+   
+   trigger_error() 函数能结合内置的错误处理器所关联，或者可以使用用户定义的函数作为新的错误处理程序(set_error_handler())
+   
+   trigger_error(errormsg,errortype)
+   
+   ~~~
+   errormsg:错误消息，required
+   errortype:optional  错误类型
+   					E_USER_ERROR
+   					E_USER_WARNING
+   					E_USER_NOTICE（默认）
+   ~~~
+   
+   ~~~
+   function foo($a) {
+   	if ($a <= 10) echo $a;
+   	if ($a > 10) {
+   		trigger_error('var can not be gt 10'); 
+   	}
+   }
+   
+   foo(1);
+   foo(12);
+   
+   输出：
+   1
+   PHP Notice:  var can not be gt 10 in /usercode/file.php on line 5
+   ~~~
+   
    
 
 #### 3. 匿名函数
@@ -191,6 +223,8 @@ echo $example();		//world;
 $message = 'hello';
 echo $example();	   //hello    想想为什么
 ~~~
+
+
 
 #### 4. 匿名类
 
