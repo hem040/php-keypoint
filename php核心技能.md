@@ -1,5 +1,179 @@
 # php核心技能
 
+### 基础知识
+
+#### 1. 可变变量
+
+在php中，可以将一个变量的值作为另一个变量的，即
+
+~~~
+$a = 'foo';
+$$a = 'foo2';  //相当于 $foo = 'foo2';
+echo $$a;	   // foo2
+$a = 'foo3';   // 
+echo $foo;     // foo2
+echo $$a;      // Undefined variable: foo3
+~~~
+
+~~~
+<?php
+class foo {
+    var $bar = 'I am bar.';
+    var $arr = array('I am A.', 'I am B.', 'I am C.');
+    var $r   = 'I am r.';
+}
+
+$foo = new foo();
+$bar = 'bar';
+$baz = array('foo', 'bar', 'baz', 'quux');
+echo $foo->$bar . "\n";			\\ I am bar
+echo $foo->$baz[1] . "\n";		\\ I am bar  先读取$baz[1],再读$foo->bar
+
+$start = 'b';
+$end   = 'ar';
+echo $foo->{$start . $end} . "\n";  \\I am bar 相当于$foo->bar  
+
+$arr = 'arr';
+echo $foo->$arr[1] . "\n";	\\I am r.  先读取字符串$arr[1],再读取 $foo->r
+echo $foo->{$arr}[1] . "\n"; \\ I am B  先读取 $foo->arr,再读取属性数组
+~~~
+
+可变变量可用于动态设置变量名。
+
+注意：
+
+	1. 要将可变变量用于数组，必须解决一个模棱两可的问题。这就是当写下 $$a[1] 时，解析器需要知道是想要 $a[1] 作为一个变量呢，还是想要$$a 作为一个变量并取出该变量中索引为 [1] 的值。解决此问题的语法是，对第一种情况用 ${$a[1]}，对第二种情况用 ${$a}[1]。默认情况下为${$a[1]}。
+ 	2. 类的属性也可以通过可变属性名来访问。可变属性名将在该调用所处的范围内被解析。例如，对于 $foo->$bar 表达式，则会在本地范围来解析 $bar 并且其值将被用于 $foo 的属性名。对于 $bar 是数组单元时也是一样。
+ 	3. 在 PHP 的函数和类的方法中，[超全局变量](https://www.php.net/manual/zh/language.variables.superglobals.php)不能用作可变变量。*$this* 变量也是一个特殊变量，不能被动态引用。
+
+#### 2. 匿名函数
+
+匿名函数（闭包），允许临时创建一个没有指定名称的函数。经常用于回调函数的参数值。
+
+匿名函数的实现是通过php内置类  Closure来实现的
+
+eg:
+
+~~~
+<?php
+echo preg_replace_callback('~-([a-z])~', function ($match) {
+    return strtoupper($match[1]);
+}, 'hello-world');
+// 输出 helloWorld  匹配到-w, $match值为-w，匿名函数返回W,替换后的为helloWorld
+~~~
+
+闭包函数也可以作为变量的值来使用，此时相当于实例化 Closure类给$foo对象
+
+~~~
+$foo = function($a) 
+{
+	echo $a;
+}
+$foo('I am a closures');  //I am a closures
+~~~
+
+闭包可以从父作用域中继承变量。 任何此类变量都应该用 *use* 语言结构传递进去。 PHP 7.1 起，不能传入此类变量： （预定义变量）[superglobals](https://www.php.net/manual/zh/language.variables.predefined.php)、 $this 或者和参数重名。
+
+全局变量，存在于一个全局范围，无需继承，无论当前执行的是哪个函数。
+
+<u>闭包从父作用于继承变量，只继承闭包定义之前的，如果变量在闭包定义后改变的，将无法继承到闭包中，当然引用除外，此时，强行改变了变量指向地址块。</u>
+
+~~~
+$message = 'hello';
+
+// 没有 "use"
+$example = function () {
+    var_dump($message);
+};
+echo $example();		//udifined variable  未继承父类的变量
+
+$example = function () use ($message) {
+    var_dump($message);
+};
+echo $example();		//hello
+
+$message = 'world';
+echo $example();		//hello 想想为什么？
+
+$example = function () use (&$message) {
+    var_dump($message);
+};
+echo $example();		//world;
+
+$message = 'hello';
+echo $example();	   //hello    想想为什么
+~~~
+
+#### 3. 匿名类
+
+匿名类可以创建一次性的简单对象
+
+~~~
+<?php
+/*********************匿名函数************************/
+
+$fu = function(){
+    echo "这是匿名函数";
+};
+$fu();
+echo "<br/>";
+
+class Animal{
+    
+    public $num;
+    public function __construct($key){
+        $this->num = $key;
+    }
+    
+    public function getValue($sum):int{
+        return $this->num+$sum;
+    }
+}
+$animal = new Animal(5);
+echo $animal->getValue(10);
+
+echo "<br/>";
+
+/****************************匿名类***********************/
+echo "这是匿名类<br/>";
+echo (new class(5) extends Animal{})->getValue(90); //95
+echo "<br/>";
+echo (new class(5) extends Animal{})->getValue(100);  //105
+~~~
+
+注：匿名类被嵌套进普通类后，不能访问这个 外部类的 私有(private)、受保护(protected)方法或属性。但如果想访问protected方法或属性，可以 继承（extends）这个外部类，想访问这个 私有（private）方法或属性，可以通过构造器，如下代码所示:
+
+~~~
+<?php
+class Animal{
+    private $num = 1;
+    
+    protected $age = 2;
+    
+    protected function bark(){
+        return 10;
+    }
+    
+    public function drive(){
+        return new class($this->num) extends Animal{  //匿名类访问普通类的私有属性通过构造器
+            protected $id;
+            
+            public function __construct($sum){   
+                $this->id = $sum;
+            }
+            
+            public function eat(){
+                return $this->id+$this->age+$this->bark();  //访问私有类的受保护方法和属性，通过继承
+            }
+        };
+    }
+}
+
+echo (new Animal)->drive()->eat();  //13
+~~~
+
+
+
 ### 面向对象
 
 #### 类self和static区别
@@ -307,7 +481,7 @@ $objA->methodA();								//输出 a
 
 安装成功，则会出现如下信息，进出xdebug.so的目录位置
 
-![](.\images\174510_nRXs_1761919.jpg)
+![](G:\study\技能考核\php-\images\174510_nRXs_1761919.jpg)
 
 ###### 配置
 
