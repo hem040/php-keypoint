@@ -583,9 +583,153 @@ $objA->methodA();								//输出 a
 
 ###### 1. 单例模式
 
+​	概念：单例模式是一种软件设计模式，它将类的实例化限制为一个对象。当需要一个对象来协调整个系统的操作时，这非常有用。
+
+​	要创建单例，需禁用构造方法，禁用克隆，禁用扩展，并创建静态变量以容纳实例。
+
+~~~
+class RpcClient() 
+{
+	private static $instance;
+	public function __construct() 
+	{
+		
+	}
+	
+	public function __clone() 
+	{
+	
+	}
+	
+	public function __wakeup() 
+	{
+	
+	}
+	
+	public static function getInstance() 
+	{
+		if (!self::$instance) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+}
+~~~
+
+
+
+​	单例模式
+
 1. 懒汉
 
- 	2. 饿汉
+   懒汉模式即在第一次调用时实例化自己。即上面这种模式。
+
+  2. 饿汉
+
+     已提前创建好实例：
+
+     ~~~
+     2 class RpcClient() 
+     3 {
+     4	private static $instance = new self();  //这么写会报语法错误，原理是这样的
+     	public function __construct() 
+     	{
+     		
+     	}
+     	
+     	public function __clone() 
+     	{
+     	
+     	}
+     	
+     	public function __wakeup() 
+     	{
+     	
+     	}
+     	
+     	public static function getInstance() 
+     	{
+     		if (!self::$instance) {
+     			self::$instance = new self();
+     		}
+     		return self::$instance;
+     	}
+     }
+     
+     PHP Parse error:  syntax error, unexpected T_NEW in /usercode/file.php on line 4
+     ~~~
+
+     附：一个redis的单例模式
+
+     ~~~
+     <?php
+     class redis
+     {
+         const REDISHOST = '127.0.0.1';
+         const REDISPORT = '6379';
+         const REDISPASWORD = '';
+         const REDISDBNAME = 0;
+         private static $_obj = null;
+         private function __construct(){
+         }
+         private function __clone(){}//禁止克隆
+         private  static function connect_redis($dbname = null)
+         {
+             try{
+                 self::$_obj = new redis();
+                 self::$_obj->connect(self::REDISHOST,self::REDISPORT);
+                 if(self::REDISPASWORD){
+                     self::$_obj->auth(self::REDISPASWORD);
+                 }
+                 if($dbname){
+                     $dbname = (int)$dbname;
+                     self::$_obj->select($dbname);
+                 }else{
+                     self::$_obj->select(self::REDISDBNAME);
+                 }
+             }catch (Exception $e){
+                 exit($e->getMessage().'<br/>');
+             }
+             return self::$_obj;
+         }
+         public static function getRedis()
+         {
+             if(!self::$_obj){
+                 self::$_obj = self::connect_redis();
+             }
+             return self::$_obj;
+         }
+         public function set($key,$value)
+         {
+             if(!empty($key) && !empty($value)){
+                 return self::$_obj->set($key,$value);
+             }else{
+                 return false;
+             }
+         }
+         public function get($key)
+         {
+             if(!empty($key)){
+                 return self::$_obj->get($key);
+             }else{
+                 return false;
+             }
+         }
+         public function exists($key)
+         {
+             if(!empty($key)){
+                 return self::$_obj->exists($key);
+             }else{
+                 return false;
+             }
+         }
+     }
+     //直接调用getredis
+     $redis =  redis::getredis();
+     $redis->get('a');
+     ~~~
+
+     
 
 ###### 2. 简单工厂模式
 
