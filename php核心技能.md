@@ -626,7 +626,7 @@ class RpcClient()
 
   2. 饿汉
 
-     已提前创建好实例：
+     在类被加载时，已提前创建好实例并在静态变量$instance中：
 
      ~~~
      2 class RpcClient() 
