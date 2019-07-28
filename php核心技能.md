@@ -224,9 +224,79 @@ $message = 'hello';
 echo $example();	   //hello    想想为什么
 ~~~
 
+#### 4. yeild关键字
+
+​	概念：生成器函数的核心是**yield**关键字。它最简单的调用形式看起来像一个return申明，不同之处在于普通return会返回值并终止函数的执行，而yield会返回一个值给循环调用此生成器的代码并且只是暂停执行生成器函数。
+
+~~~
+<?php
+function foo($n) {
+    for($i=1;$i<=$n;$i++) {
+        yield $i;
+    }
+}
+
+$a = foo(4);
+
+foreach ($a as $v) {
+    echo $v . "\n";
+}
+
+输出：
+1
+2
+3
+4
+~~~
+
+如果在一个表达式上下文(例如在一个赋值表达式的右侧)中使用yield，你必须使用圆括号把yield申明包围起来。 例如这样是有效的：
+
+~~~
+$data = (yield $value);      //不能使用 $data = yield $value;
+~~~
+
+~~~
+<?php
+/* 
+ * 下面每一行是用分号分割的字段组合，第一个字段将被用作键名。
+ */
+
+$input = <<<'EOF'
+1;PHP;Likes dollar signs
+2;Python;Likes whitespace
+3;Ruby;Likes blocks
+EOF;
+
+function input_parser($input) {
+    foreach (explode("\n", $input) as $line) {
+        $fields = explode(';', $line);
+        $id = array_shift($fields);
+
+        yield $id => $fields;
+    }
+}
+
+foreach (input_parser($input) as $id => $fields) {
+    echo "$id:\n";
+    echo "    $fields[0]\n";
+    echo "    $fields[1]\n";
+}
+
+输出：
+1:
+    PHP
+    Likes dollar signs
+2:
+    Python
+    Likes whitespace
+3:
+    Ruby
+    Likes blocks
+~~~
 
 
-#### 4. 匿名类
+
+#### 5. 匿名类
 
 匿名类可以创建一次性的简单对象
 
