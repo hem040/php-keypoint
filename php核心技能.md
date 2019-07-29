@@ -164,6 +164,46 @@ echo $foo->{$arr}[1] . "\n"; \\ I am B  先读取 $foo->arr,再读取属性数�
    PHP Notice:  var can not be gt 10 in /usercode/file.php on line 5
    ~~~
    
+   6. set_error_handler-设置用户自定义的错误处理函数
+   
+      ~~~
+      set_error_handler(calleble $error_handler, [, int $error_types = E_ALL | E_STRICT ]):  NULL|indexed array
+      --- 设置用户的回调函数 (error_handler) 来处理脚本中出现的错误
+      --- error_types 触发的错误类型
+      ~~~
+   
+      ~~~
+      以下级别的错误不能由用户定义的函数来处理： E_ERROR、 E_PARSE、 E_CORE_ERROR、 E_CORE_WARNING、 E_COMPILE_ERROR、 E_COMPILE_WARNING，和在 调用 set_error_handler() 函数所在文件中产生的大多数 E_STRICT。
+      
+      如果错误发生在脚本执行之前（比如文件上传时），将不会 调用自定义的错误处理程序因为它尚未在那时注册。
+      ~~~
+
+7. ini_get和ini_set
+
+   ~~~
+   ini_set(string $varname , string $newvalue); -- 获取php一个配置选项的值，成功时返回旧的值，失败时返回 FALSE。
+   notice:
+   	设置指定配置选项的值。这个选项会在脚本运行时保持新的值，并在脚本结束时恢复。
+   ~~~
+
+   ~~~
+   int_get(string $varname); -- 获取php一个配置选项的值，成功是返回配置选项值的字符串，null 的值则返回空字符串。如果配置选项不存在，将会返回 FALSE。
+   notice:
+   	1. 当查询一个 boolean 值,一个 off 的 boolean ini 值将会以空字符串或者 "0" 返回；on 的 ini 值会以 "1" 返回。 此函数也会返回 INI 值的文字字符串。
+   	2. 当查询一个内存尺寸的值,许多内存尺寸的 ini 值，类似 upload_max_filesize 是以简写表示法储存在 php.ini 文件里。 ini_get() 会返回 php.ini 文件中储存的确切字符串，而不是它的等量 integer。 尝试对这些值使用常规算术运算函数将不会得到预期的结果。
+   	3. ini_get() 无法读取 "array" 的 ini 选项，例如 pdo.dsn.*，在这个例子中会返回 FALSE 。
+   ~~~
+
+   ~~~
+   ini_get_all([ string $extension [, bool $details = true ]] ):array -- 批量获取所有已注册的配置选项
+   
+   -- extension
+   可选的扩展名称。如果设置了，此函数仅仅返回指定该扩展的选项。
+   
+   -- details
+   获取详细设置或者仅仅是每个设置的当前值。 默认是 TRUE（获取详细信息）。
+   ~~~
+
    
 
 #### 3. 匿名函数
