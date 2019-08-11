@@ -178,7 +178,7 @@ echo $foo->{$arr}[1] . "\n"; \\ I am B  先读取 $foo->arr,再读取属性数�
       如果错误发生在脚本执行之前（比如文件上传时），将不会 调用自定义的错误处理程序因为它尚未在那时注册。
       ~~~
 
-7. ini_get和ini_set
+7.   ini_get和ini_set
 
    ~~~
    ini_set(string $varname , string $newvalue); -- 获取php一个配置选项的值，成功时返回旧的值，失败时返回 FALSE。
@@ -204,7 +204,67 @@ echo $foo->{$arr}[1] . "\n"; \\ I am B  先读取 $foo->arr,再读取属性数�
    获取详细设置或者仅仅是每个设置的当前值。 默认是 TRUE（获取详细信息）。
    ~~~
 
-   
+
+#### 3. PHP的语言结构
+
+1. 什么是语言结构
+
+   ~~~
+   1. 语言结构就是PHP的关键字，是PHP语法的一部分。
+   2. 语言结构不可以被用户定义或者添加到扩展库中。
+   3. 语言结构可以有也可以没有变量或者返回值。
+   ~~~
+
+2. 语言结构的执行速度
+
+   ~~~
+   语言结构的执行速度比函数快，函数需要先经php解析器（Zend引擎）解析成语言结构，相比语言结构多了一个解析的过程。
+   ~~~
+
+3. 常见的语言结构
+
+   ~~~
+   echo
+   print
+   die/exit
+   isset/unset
+   include(_once)/require(_once)
+   array()
+   list()
+   empty()
+   ~~~
+
+4. 检测是语言结构还是函数
+
+   ~~~
+   通过函数function_exists()检测
+   ~~~
+
+5. 语言结构与函数的区别
+
+   ~~~
+   1. 速度  语言结构>函数  函数需要经过PHP解析器解析成语言结构的过程
+   2. 语言结构不能再对错误进行再处理，函数可以
+   3. 语言结构不能在php.ini中禁用，函数可以
+   4. 语言结构不能被用作回调函数
+   ~~~
+
+6. php怎样禁用函数，禁用哪些关键函数
+
+   ~~~
+   修改php.ini的disable_functions配置项
+   eg: disable_functions = exec,passthru,popen,proc_open,shell_exec,system,chgrp,chmod,chown
+   ~~~
+
+7. require include require_once include_once
+
+~~~
+require:如果引入文件异常，会报一个ERROR级别错误，脚本会终止执行
+include:引入错误，报一个WARNING级别错误，脚本会继续执行
+require_once和include_once 会检查前面有没有引入，如果已经引入将不再次引入，会消耗更多的资源去做这个检查，但是对于计算机来说，这个资源可以接受，一般选择这两个方式引入
+~~~
+
+
 
 #### 3. 匿名函数
 
