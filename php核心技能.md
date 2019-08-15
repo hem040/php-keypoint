@@ -204,6 +204,41 @@ echo $foo->{$arr}[1] . "\n"; \\ I am B  先读取 $foo->arr,再读取属性数�
    获取详细设置或者仅仅是每个设置的当前值。 默认是 TRUE（获取详细信息）。
    ~~~
 
+5. set_error_handler和set_exception_hamdler
+
+   ~~~
+   set_error_handler:设置用户自定义错误处理函数
+   set_exception_handler:设置用户自定义异常处理函数
+   set_error_handler(callable $error_handler[, int $error_types=E_ALL|E_STRICT
+   ]):mixed
+   set_exception_handler(callable $exception_handler):callable
+   eg:
+   
+   <?php
+   function exception_handler($exception) {
+     echo "Uncaught exception: " , $exception->getMessage(), "\n";
+   }
+   
+   set_exception_handler('exception_handler');
+   
+   throw new Exception('Uncaught Exception');
+   echo "Not Executed\n";
+   ~~~
+
+6. error_get_last()
+
+   ~~~
+   获取脚本最后一次错误
+   ~~~
+
+7. register_shutdown_function
+
+   ~~~
+   注册一个在php中止时执行的函数
+   register_shutdown_function ( callable $callback [, mixed $parameter [, mixed $... ]] ) : void
+   -- 注册一个callback,它会在脚本执行完成或者exit()后被调用
+   -- 可以多次调用 register_shutdown_function() ，这些被注册的回调会按照他们注册时的顺序被依次调用。 如果你在注册的方法内部调用 exit()， 那么所有处理会被中止，并且其他注册的中止回调也不会再被调用。
+   ~~~
 
 #### 3. PHP的语言结构
 
@@ -744,6 +779,59 @@ $objA->methodA();								//输出 a
 ~~~
 
 ###### 从 trait 来组成 trait
+
+#### Throwable类
+
+~~~
+Throwable 是 PHP 7 中可以用作任何对象抛出声明的基本接口，包括 Expection （异常）和 Error （错误）
+
+<?php
+Throwable {
+    
+  /* 抽象方法 */
+  abstract public string getMessage ( void ) // 获取抛出的消息内容
+
+  abstract public int getCode ( void ) // 获取抛出的错误代码
+
+  abstract public string getFile ( void ) // 获取产生异常的文件名
+
+  abstract public int getLine ( void ) // 获取相关行号
+
+  abstract public array getTrace ( void ) // 获取追踪信息，返回数组形式
+
+  abstract public string getTraceAsString ( void ) // 获取追踪信息，返回字符串形式
+
+  abstract public Throwable getPrevious ( void ) // 返回上一个 Throwable
+
+  abstract public string __toString ( void ) // 抛出的对象以字符串形式返回，可以用 echo 打印相应结果
+
+}
+
+明明set_exception_handler()函数只可以捕获Exception类或派生类的对象，为何还需要捕获的对象做判断呢？结果引出了PHP7的变化，请看下面分析
+
+前面已经讲过异常是需要手动抛出，及时上面所说的方法最多也是把Deprecated、Notice、Waning这3类错误封装成系统自动抛出的异常，但致命错误仍然还是无法封装成系统自动抛出的异常，因为致命错误（Fatel Error）仍然无法捕获
+
+在PHP7之前，Deprecated、Notice、Waning这类错误是可以捕获的（使用set_error_handler()函数），而Fatel Error无法捕获的
+
+在PHP7之后，出现了一个异常与错误通用的接口Throwable，Exception类与Error类都实现了该接口，导致Error类或Error类的派生类的错误对象（大部分Fatel Error,而之前三类错误不变）也可以像Exception一样被捕获（2种捕获方法：1、try/catch 2、set_exception_handler（））
+
+try{
+    go();//该函数未定义
+}catch(Exception $e){
+    //捕获异常
+}catch(Error $er){
+    //捕获错误
+}
+
+public static function appException($e) 
+{
+	if (!$e instanceof \Exception) {
+		$e = new ThrowableError($e);
+	}
+}
+~~~
+
+
 
 #### 设计模式
 
