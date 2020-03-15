@@ -1160,3 +1160,34 @@ xdebug.show_exception_trace = 1
 在请求头
 
 headers加上key值为Cookie，value为XDEBUG_SESSION=PHPSTORM，phpstorm同样打开监听即可。
+
+### composer
+
+#### composer的安装
+
+##### 1. 下载安装composer
+
+执行命令 curl -sS https://getcomposer.org/installer | php
+
+##### 2. 配置环境变量
+
+mv composer.phar /usr/local/bin/composer
+
+##### 3. 创建用户composeruser,专门操作composer
+
+##### 4. 将composeruser用户设置为不需要命令操作
+
+~~~
+在root模式下，vim /etc/sudoers,加上如下内容
+root    ALL=(ALL)       ALL
+# 个人新增composeruser这个用户，用以操作composer
+composeruser ALL=(ALL) NOPASSWD:ALL
+~~~
+
+##### 5. 将root的composer配置复制到composer用户配置下
+
+~~~
+sudo mv composer.phar /usr/local/bin/composer
+配置国内镜像composer config -g repo.packagist composer https://packagist.phpcomposer.com
+~~~
+
